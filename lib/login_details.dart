@@ -24,7 +24,6 @@ class _LoginDetailState extends State<LoginDetail> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * .8,
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300),
         alignment: childAlignment,
@@ -32,15 +31,16 @@ class _LoginDetailState extends State<LoginDetail> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
+
           child: Container(
-            height: 400,
+            height: MediaQuery.of(context).size.height * .6,
             width: 350,
             child: Column(
               children: <Widget>[
                 //Login text field
                 Container(
                   padding: EdgeInsets.only(
-                    top: 15,
+                    top: 20,
                     left: 30,
                     right: 30,
                   ),

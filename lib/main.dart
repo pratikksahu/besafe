@@ -32,7 +32,6 @@ class MyApp extends StatelessWidget {
                     'BeSafe',
                     style: TextStyle(
                       fontSize: 50,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -44,19 +43,21 @@ class MyApp extends StatelessWidget {
                         Image.asset(
                           'assets/health.png',
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 90),
-                          child: Text(
-                            'Stay home , stay safe',
-                            style: TextStyle(fontSize: 20 , fontWeight: FontWeight.bold),
-                          ),
-                        ),
+                        // Padding(
+                        //   padding: EdgeInsets.only(top: 90),
+                        //   child: Text(
+                        //     'Stay home , stay safe',
+                        //     style: TextStyle(fontSize: 20 , fontWeight: FontWeight.bold),
+                        //   ),
+                        // ),
                       ],
                     )),
                 Expanded(
-                  flex: 9,
+                  flex: 8,
                   child: LoginDetail(),
-                )
+                ),
+                SizedBox(height: 40.0,)
+
               ],
             ),
           ),
