@@ -36,28 +36,23 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                    flex: 2,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: <Widget>[
-                        Image.asset(
-                          'assets/health.png',
-                        ),
-                        // Padding(
-                        //   padding: EdgeInsets.only(top: 90),
-                        //   child: Text(
-                        //     'Stay home , stay safe',
-                        //     style: TextStyle(fontSize: 20 , fontWeight: FontWeight.bold),
-                        //   ),
-                        // ),
-                      ],
-                    )),
+                  flex: 2,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      Image.asset(
+                        'assets/health.png',
+                      ),
+                    ],
+                  ),
+                ),
                 Expanded(
                   flex: 8,
                   child: LoginDetail(),
                 ),
-                SizedBox(height: 40.0,)
-
+                SizedBox(
+                  height: 40.0,
+                )
               ],
             ),
           ),

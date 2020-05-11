@@ -34,7 +34,7 @@ class _LoginDetailState extends State<LoginDetail> {
 
           child: Container(
             height: MediaQuery.of(context).size.height * .6,
-            width: 350,
+            width: MediaQuery.of(context).size.height * .43,
             child: Column(
               children: <Widget>[
                 //Login text field
