@@ -23,111 +23,111 @@ class _LoginDetailState extends State<LoginDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
-        alignment: childAlignment,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-
-          child: Container(
-            height: MediaQuery.of(context).size.height * .60,
-            width: MediaQuery.of(context).size.width * .85,
-            child: Column(
-              children: <Widget>[
-                //Login text field
-                Container(
-                  padding: EdgeInsets.only(
-                    top: 20,
-                    left: 30,
-                    right: 30,
-                  ),
-                  width: 300,
-                  child: TextField(
-                    textCapitalization: TextCapitalization.words,
-                    decoration: InputDecoration(
-                      labelText: 'First Name',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 10.0,
-                        vertical: 10.0,
-                      ),
+    return AnimatedContainer(
+      height: MediaQuery.of(context).size.height * .7 ,
+      curve: Curves.elasticIn,
+      duration: Duration(milliseconds: 500),
+      alignment: childAlignment,
+      child: Card(
+        elevation: 20.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          height: MediaQuery.of(context).size.height * .60,
+          width: MediaQuery.of(context).size.width * .85,
+          child: Column(
+            children: <Widget>[
+              //Login text field
+              Container(
+                padding: EdgeInsets.only(
+                  top: 20,
+                  left: 30,
+                  right: 30,
+                ),
+                width: 300,
+                child: TextField(
+                  textCapitalization: TextCapitalization.words,
+                  decoration: InputDecoration(
+                    labelText: 'First Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 10.0,
                     ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.only(
-                    top: 30,
-                    left: 30,
-                    right: 30,
-                  ),
-                  width: 300,
-                  child: TextField(
-                    textCapitalization: TextCapitalization.words,
-                    decoration: InputDecoration(
-                      labelText: 'Last Name',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 10.0,
-                        vertical: 10.0,
-                      ),
+              ),
+              Container(
+                padding: EdgeInsets.only(
+                  top: 30,
+                  left: 30,
+                  right: 30,
+                ),
+                width: 300,
+                child: TextField(
+                  textCapitalization: TextCapitalization.words,
+                  decoration: InputDecoration(
+                    labelText: 'Last Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 10.0,
                     ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.only(
-                    top: 30,
-                    left: 30,
-                    right: 30,
-                    bottom: 20,
-                  ),
-                  width: 300,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Phone',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 10.0,
-                        vertical: 10.0,
-                      ),
+              ),
+              Container(
+                padding: EdgeInsets.only(
+                  top: 30,
+                  left: 30,
+                  right: 30,
+                  bottom: 20,
+                ),
+                width: 300,
+                child: TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Phone',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 10.0,
                     ),
                   ),
                 ),
-                RaisedButton(
-                  color: Colors.amber,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  child: Text(
-                    'Sign In',
-                    style: TextStyle(fontSize: 17.0),
-                  ),
-                  onPressed: () {},
+              ),
+              RaisedButton(
+                color: Colors.amber,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
                 ),
-                Container(
-                  margin: EdgeInsets.only(
-                    top: 15,
-                  ),
-                  height: 90,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(
-                        'assets/bitlogo.png',
-                      ),
+                child: Text(
+                  'Sign In',
+                  style: TextStyle(fontSize: 17.0),
+                ),
+                onPressed: () {},
+              ),
+              Container(
+                margin: EdgeInsets.only(
+                  top: 15,
+                ),
+                height: 90,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/bitlogo.png',
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

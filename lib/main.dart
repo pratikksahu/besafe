@@ -2,6 +2,8 @@ import 'package:besafe/login_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import 'circle_rotation.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -15,13 +17,7 @@ class MyApp extends StatelessWidget {
           resizeToAvoidBottomInset: false,
           body: Container(
             width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [Colors.amber, Colors.deepPurple],
-              ),
-            ),
+            color: Color.fromARGB(255, 249, 250, 247),
             child: Column(
               children: <Widget>[
                 Container(
@@ -35,24 +31,8 @@ class MyApp extends StatelessWidget {
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: 2,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: <Widget>[
-                      Image.asset(
-                        'assets/health.png',
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex: 8,
-                  child: LoginDetail(),
-                ),
-                SizedBox(
-                  height: 40.0,
-                )
+                CircleRotate(),
+                LoginDetail(),
               ],
             ),
           ),
