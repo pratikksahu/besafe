@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
-import 'dart:math' as math;
 
 class CircleRotate extends StatefulWidget {
   CircleRotate({Key key}) : super(key: key);
@@ -47,7 +46,7 @@ class _CircleRotateState extends State<CircleRotate>
       builder: (BuildContext context, Widget child) {
         return ScaleTransition(
           // angle: _controller.value * math.pi,
-           scale: _animator,
+          scale: _animator,
           child: child,
         );
       },

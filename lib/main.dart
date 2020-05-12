@@ -1,4 +1,4 @@
-import 'package:besafe/login_details.dart';
+import 'package:besafe/screens/login/login_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
