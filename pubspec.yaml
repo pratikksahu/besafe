@@ -21,12 +21,11 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  firebase_auth: ^0.16.0
-  cloud_firestore: ^0.13.5
-  firebase_core: ^0.4.4+3
-  keyboard_visibility: ^0.5.6
   flutter:
     sdk: flutter
+
+  keyboard_visibility: any
+  firebase_auth: any
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -79,4 +78,4 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
 module:
-  androidX: true // Add this line
+  androidX: true

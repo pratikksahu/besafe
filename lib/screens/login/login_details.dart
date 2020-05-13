@@ -134,9 +134,9 @@ class _LoginDetailState extends State<LoginDetail> {
                   style: TextStyle(fontSize: 17.0),
                 ),
                 onPressed: () async {
-                  setState(() {
-                    otpBox = true;
-                  });
+                  // setState(() {
+                  //   otpBox = true;
+                  // });
                   phoneVerify(phone);
                 },
               ),
@@ -166,13 +166,17 @@ class _LoginDetailState extends State<LoginDetail> {
 
     final PhoneCodeAutoRetrievalTimeout _autoRetrieve = (String vFID) {
       verificationID = vFID;
+      print('TimeOut $verificationID');
     };
 
-    final PhoneCodeSent codeSent = (String vFID, [int forceCodeResend]) {
+    final PhoneCodeSent codeSent = (String vFID, [int forceCodeResend]) async {
+      setState(() {
+        otpBox = true;
+      });
       void otpLogin() async {
         AuthCredential authCredential = PhoneAuthProvider.getCredential(
           verificationId: vFID,
-          smsCode: otp.toString().trim(),
+          smsCode: smsCode,
         );
         try {
           toMove = await _auth.signInWithCredential(authCredential);
@@ -183,7 +187,11 @@ class _LoginDetailState extends State<LoginDetail> {
         if (result != null) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => HomePage()),
+            MaterialPageRoute(
+              builder: (_) => HomePage(
+                user: result,
+              ),
+            ),
           );
         }
       }
@@ -198,7 +206,11 @@ class _LoginDetailState extends State<LoginDetail> {
       if (result != null) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => HomePage()),
+          MaterialPageRoute(
+            builder: (_) => HomePage(
+              user: result,
+            ),
+          ),
         );
       }
     };
@@ -208,8 +220,8 @@ class _LoginDetailState extends State<LoginDetail> {
 
     try {
       await _auth.verifyPhoneNumber(
-          phoneNumber: this.phone,
-          timeout: const Duration(seconds: 0),
+          phoneNumber: phone,
+          timeout: const Duration(seconds: 30),
           verificationCompleted: verificationSuccess,
           verificationFailed: verificationFailed,
           codeSent: codeSent,
