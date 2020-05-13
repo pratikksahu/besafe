@@ -26,6 +26,7 @@ dependencies:
 
   keyboard_visibility: any
   firebase_auth: any
+  provider: ^3.1.0
 
 
   # The following adds the Cupertino Icons font to your application.

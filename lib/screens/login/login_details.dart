@@ -1,5 +1,6 @@
 import 'package:besafe/screens/home/home_page.dart';
 import 'package:besafe/screens/login/otp_box.dart';
+import 'package:besafe/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
@@ -10,11 +11,13 @@ class LoginDetail extends StatefulWidget {
 }
 
 class _LoginDetailState extends State<LoginDetail> {
-  String fName, lname, phone, verificationID, smsCode;
+  String fName, lname, phone, verificationID, smsCode, fullName;
   AuthResult toMove;
   FirebaseUser result;
   bool otpBox = false;
   String otp;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Alignment childAlignment = Alignment.bottomCenter;
   @override
@@ -34,6 +37,19 @@ class _LoginDetailState extends State<LoginDetail> {
     this.otp = otpKey;
   }
 
+  void setNavigator(FirebaseUser user) async {
+    print('------------$user');
+    if (user != null) {
+      result = user;
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => HomePage(
+                    user: result,
+                  )));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
@@ -46,7 +62,7 @@ class _LoginDetailState extends State<LoginDetail> {
           borderRadius: BorderRadius.circular(20),
         ),
         child: Container(
-          height: MediaQuery.of(context).size.height * .60,
+          height: MediaQuery.of(context).size.height * .70,
           width: MediaQuery.of(context).size.width * .85,
           child: Column(
             children: <Widget>[
@@ -134,17 +150,18 @@ class _LoginDetailState extends State<LoginDetail> {
                   style: TextStyle(fontSize: 17.0),
                 ),
                 onPressed: () async {
-                  // setState(() {
-                  //   otpBox = true;
-                  // });
-                  phoneVerify(phone);
+                  setState(() {
+                    fullName = fName + lname;
+                    otpBox = true;
+                  });
+                  await Authenticator(otp, setNavigator).phoneVerify(phone);
                 },
               ),
               Container(
                 margin: EdgeInsets.only(
                   top: 15,
                 ),
-                height: 90,
+                height: MediaQuery.of(context).size.height * .1,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   image: DecorationImage(
@@ -159,75 +176,5 @@ class _LoginDetailState extends State<LoginDetail> {
         ),
       ),
     );
-  }
-
-  Future<void> phoneVerify(String phone) async {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-
-    final PhoneCodeAutoRetrievalTimeout _autoRetrieve = (String vFID) {
-      verificationID = vFID;
-      print('TimeOut $verificationID');
-    };
-
-    final PhoneCodeSent codeSent = (String vFID, [int forceCodeResend]) async {
-      setState(() {
-        otpBox = true;
-      });
-      void otpLogin() async {
-        AuthCredential authCredential = PhoneAuthProvider.getCredential(
-          verificationId: vFID,
-          smsCode: smsCode,
-        );
-        try {
-          toMove = await _auth.signInWithCredential(authCredential);
-          result = toMove.user;
-        } catch (e) {
-          print(e);
-        }
-        if (result != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => HomePage(
-                user: result,
-              ),
-            ),
-          );
-        }
-      }
-
-      otpLogin();
-    };
-
-    final PhoneVerificationCompleted verificationSuccess =
-        (AuthCredential user) async {
-      toMove = await FirebaseAuth.instance.signInWithCredential(user);
-      result = toMove.user;
-      if (result != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => HomePage(
-              user: result,
-            ),
-          ),
-        );
-      }
-    };
-    final PhoneVerificationFailed verificationFailed = (AuthException exc) {
-      print('Error ${exc.message}');
-    };
-
-    try {
-      await _auth.verifyPhoneNumber(
-          phoneNumber: phone,
-          timeout: const Duration(seconds: 30),
-          verificationCompleted: verificationSuccess,
-          verificationFailed: verificationFailed,
-          codeSent: codeSent,
-          codeAutoRetrievalTimeout: _autoRetrieve);
-    } catch (e) {
-      print('Error on verify phone number $e');
-    }
   }
 }
