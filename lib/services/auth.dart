@@ -1,3 +1,4 @@
+import 'package:besafe/model/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Authenticator {
@@ -8,6 +9,10 @@ class Authenticator {
   AuthResult toMove;
 
   FirebaseAuth _auth = FirebaseAuth.instance;
+
+  _createUserObj(FirebaseUser user){
+    return user != null ? setter(User(uID: user.uid)) : setter(null);
+  }
 
   Future phoneVerify(String phone) async {
     
@@ -28,7 +33,7 @@ class Authenticator {
         toMove = await _auth.signInWithCredential(authCredential);
         result = toMove.user;
         print('Inside codeSent $result');
-        setter(result);
+        _createUserObj(result);
       } catch (e) {
         print('Error in codeSent $e');
       }
@@ -42,7 +47,7 @@ class Authenticator {
         result = toMove.user;
         print('User UID ${result.uid}');
         print('Inside PVC $result');
-        setter(result);
+        _createUserObj(result);
       } catch (e) {
         print(e);
       }

@@ -1,6 +1,5 @@
 class User {
   final String uID;
-  final String fname;
-  final String lname;
-  User({this.uID , this.fname,this.lname});
+  final String fullName;
+  User({this.uID , this.fullName});
 }

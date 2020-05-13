@@ -1,3 +1,4 @@
+import 'package:besafe/model/user.dart';
 import 'package:besafe/screens/home/home_page.dart';
 import 'package:besafe/screens/login/otp_box.dart';
 import 'package:besafe/services/auth.dart';
@@ -11,13 +12,10 @@ class LoginDetail extends StatefulWidget {
 }
 
 class _LoginDetailState extends State<LoginDetail> {
-  String fName, lname, phone, verificationID, smsCode, fullName;
-  AuthResult toMove;
-  FirebaseUser result;
+  String fName, lname, phone, smsCode, fullName;
   bool otpBox = false;
   String otp;
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Alignment childAlignment = Alignment.bottomCenter;
   @override
@@ -37,16 +35,18 @@ class _LoginDetailState extends State<LoginDetail> {
     this.otp = otpKey;
   }
 
-  void setNavigator(FirebaseUser user) async {
-    print('------------$user');
+  void setNavigator(User user) async {
     if (user != null) {
-      result = user;
+      User result = User(uID: user.uID , fullName: fullName);
+      print('setNavigator ${result.runtimeType}');
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => HomePage(
-                    user: result,
-                  )));
+        context,
+        MaterialPageRoute(
+          builder: (_) => HomePage(
+            user: result,
+          ),
+        ),
+      );
     }
   }
 
@@ -151,10 +151,10 @@ class _LoginDetailState extends State<LoginDetail> {
                 ),
                 onPressed: () async {
                   setState(() {
-                    fullName = fName + lname;
+                    fullName = fName +' '+lname;
                     otpBox = true;
                   });
-                  await Authenticator(otp, setNavigator).phoneVerify(phone);
+                  Authenticator(otp, setNavigator).phoneVerify(phone);
                 },
               ),
               Container(

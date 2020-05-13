@@ -1,9 +1,10 @@
+import 'package:besafe/model/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseUser user;
+  final User user;
   HomePage({this.user});
 
   @override
@@ -31,7 +32,6 @@ class HomePage extends StatelessWidget {
                   onTap: () async {
                     await _auth.signOut();
                     Navigator.of(context).pop(true);
-                    // Navigator.of(context).pop(true);
                   },
                   child: Container(
                     margin: EdgeInsets.all(10.0),
@@ -53,7 +53,7 @@ class HomePage extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
-            title: Text('Welcome ${user.phoneNumber}'),
+            title: Text('Welcome ${user.fullName}'),
           ),
           body: Center(
             child: FlatButton(
