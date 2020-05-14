@@ -1,7 +1,7 @@
+import 'package:besafe/circle_scale.dart';
 import 'package:besafe/screens/login/login_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'circle_rotation.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
                 ),
               ),
             ),
-            CircleRotate(),
+            CircleScale(),
             LoginDetail(),
           ],
         ),

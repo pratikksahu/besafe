@@ -23,6 +23,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 249, 250, 247),
       body: suspectedCity.length != totalReports
           ? Center(
               child: CircularProgressIndicator(),
@@ -39,7 +40,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       Text(
                         'Admin Dashboard',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
                       ),
                       Text(
                         'Reports : $totalReports',
@@ -59,7 +62,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       suspectedCity[index],
                     );
                   }, childCount: totalReports),
-                  itemExtent: 200.0,
+                  itemExtent: 150.0,
                 )
               ],
             ),
@@ -68,65 +71,52 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Widget cardview(String state, String dist, String city) {
     return Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      margin: new EdgeInsets.symmetric(
+        horizontal: 15.0,
+        vertical: 6.0,
+      ),
+      elevation: 4.0,
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            //SetData.psotUid=postUid;
+          });
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              container('State', '$state'),
+              container('District', '$dist'),
+              container('City', '$city'),
+            ],
+          ),
         ),
-        margin: new EdgeInsets.symmetric(
-          horizontal: 15.0,
-          vertical: 6.0,
-        ),
-        elevation: 10.0,
-        child: InkWell(
-            splashColor: Colors.blue.withAlpha(30),
-            onTap: () {
-              setState(() {
-                //SetData.psotUid=postUid;
-              });
-            },
-            child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          "State:",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text("$state", style: TextStyle(fontSize: 18)),
-                        )
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text("District:", style: TextStyle(fontSize: 18)),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text("$dist", style: TextStyle(fontSize: 18)),
-                        )
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text("City:", style: TextStyle(fontSize: 18)),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text("$city", style: TextStyle(fontSize: 18)),
-                        )
-                      ],
-                    )
-                  ],
-                ))));
+      ),
+    );
+  }
+
+  Widget container(String title, String info) {
+    return Container(
+      margin: EdgeInsets.only(top: 5, left: 5, bottom: 2),
+      child: Row(
+        children: <Widget>[
+          Text(
+            title + ' : ',
+            style: TextStyle(fontSize: 15.0),
+          ),
+          Text(
+            info,
+            style: TextStyle(fontSize: 15.0),
+          ),
+        ],
+      ),
+    );
   }
   // fatchData()async{
   //   try {

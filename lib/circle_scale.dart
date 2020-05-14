@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
 
-class CircleRotate extends StatefulWidget {
-  CircleRotate({Key key}) : super(key: key);
+class CircleScale extends StatefulWidget {
+  CircleScale({Key key}) : super(key: key);
 
   @override
-  _CircleRotateState createState() => _CircleRotateState();
+  _CircleScaleState createState() => _CircleScaleState();
 }
 
-class _CircleRotateState extends State<CircleRotate>
+class _CircleScaleState extends State<CircleScale>
     with TickerProviderStateMixin {
   AnimationController _controller;
   Animation<double> _animator;
