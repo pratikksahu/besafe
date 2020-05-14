@@ -2,9 +2,10 @@ import 'package:besafe/model/user.dart';
 import 'package:besafe/screens/home/home_page.dart';
 import 'package:besafe/screens/login/otp_box.dart';
 import 'package:besafe/services/auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
+
+import '../../adminDashboard.dart';
 
 class LoginDetail extends StatefulWidget {
   @override
@@ -62,7 +63,7 @@ class _LoginDetailState extends State<LoginDetail> {
           borderRadius: BorderRadius.circular(20),
         ),
         child: Container(
-          height: MediaQuery.of(context).size.height * .70,
+          height: MediaQuery.of(context).size.height * .55,
           width: MediaQuery.of(context).size.width * .85,
           child: Column(
             children: <Widget>[
@@ -150,11 +151,12 @@ class _LoginDetailState extends State<LoginDetail> {
                   style: TextStyle(fontSize: 17.0),
                 ),
                 onPressed: () async {
-                  setState(() {
-                    fullName = fName +' '+lname;
-                    otpBox = true;
-                  });
-                  Authenticator(otp, setNavigator).phoneVerify(phone);
+                  // setState(() {
+                  //   fullName = fName +' '+lname;
+                  //   otpBox = true;
+                  // });
+                  // Authenticator(otp, setNavigator).phoneVerify(phone);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => AdminDashboard(),));
                 },
               ),
               Container(
