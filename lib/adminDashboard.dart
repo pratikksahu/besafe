@@ -10,6 +10,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
   List<String> suspectedState = ['State 1', 'State 2', 'State 3', 'State 4'];
   List<String> suspectedDist = ['Dist 1', 'Dist 2', 'Dist 3', 'Dist 4'];
   List<String> suspectedCity = ['City 1', 'City 2', 'City 3', 'City 4'];
+  List<bool> expandCard = [false, false, false, false];
+
+  // double h = 250;
 
   int totalReports = 4;
 
@@ -53,23 +56,33 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ],
                   )),
                 ),
-                SliverFixedExtentList(
+                SliverList(
                   delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                    return cardview(
-                      suspectedState[index],
-                      suspectedDist[index],
-                      suspectedCity[index],
-                    );
-                  }, childCount: totalReports),
-                  itemExtent: 150.0,
-                )
+                    (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            expandCard[index] = !expandCard[index];
+                          });
+                        },
+                        child: cardview(
+                          suspectedState[index],
+                          suspectedDist[index],
+                          suspectedCity[index],
+                          expandCard[index],
+                        ),
+                      );
+                    },
+                    childCount: totalReports,
+                  ),
+                  // itemExtent: 150.0,
+                ),
               ],
             ),
     );
   }
 
-  Widget cardview(String state, String dist, String city) {
+  Widget cardview(String state, String dist, String city, bool expandCheck) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
@@ -79,12 +92,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
         vertical: 6.0,
       ),
       elevation: 4.0,
-      child: InkWell(
-        onTap: () {
-          setState(() {
-            //SetData.psotUid=postUid;
-          });
-        },
+      child: AnimatedContainer(
+        curve: Curves.fastLinearToSlowEaseIn,
+        duration: Duration(milliseconds: 300),
+        height: expandCheck
+            ? MediaQuery.of(context).size.height * .3
+            : MediaQuery.of(context).size.height * .18,
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
@@ -94,6 +107,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               container('State', '$state'),
               container('District', '$dist'),
               container('City', '$city'),
+              expandCheck ? SizedBox() : SizedBox(), // add more info to card
             ],
           ),
         ),

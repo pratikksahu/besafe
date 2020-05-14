@@ -1,7 +1,6 @@
 import 'package:besafe/model/user.dart';
 import 'package:besafe/screens/home/home_page.dart';
 import 'package:besafe/screens/login/otp_box.dart';
-import 'package:besafe/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 
