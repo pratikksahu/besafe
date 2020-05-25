@@ -11,17 +11,14 @@ class _HomePageState extends State<HomePage> {
   bool loaded = false;
   FirebaseUser result;
 
-  Future setUser() async{
-    result =  await FirebaseAuth.instance.currentUser();
-  }
   @override
   void initState() {
-    if(result != null){
-      loaded = true;
-    }
-    else{
-      loaded = false;
-    }
+    FirebaseAuth.instance.currentUser().then((value) {
+      result = value;
+      setState(() {
+        loaded = true;
+      });
+    });
     super.initState();
   }
 
@@ -68,23 +65,23 @@ class _HomePageState extends State<HomePage> {
       onWillPop: _onBackPressed,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: loaded
-            ? Scaffold(
-                appBar: AppBar(
-                  title: Text('Welcome ${result.phoneNumber}'),
-                ),
-                body: Center(
-                  child: FlatButton(
-                    onPressed: () async {
-                      await AuthService()
-                          .signOut()
-                          .then((value) => Navigator.pop(context));
-                    },
-                    child: Text('Sign Out'),
-                  ),
-                ),
-              )
-            : CircularProgressIndicator(),
+        home: Scaffold(
+          appBar: AppBar(
+            title: loaded
+                ? Text('Welcome ${result.phoneNumber}')
+                : Text('Welcome '),
+          ),
+          body: Center(
+            child: FlatButton(
+              onPressed: () async {
+                await AuthService()
+                    .signOut()
+                    .then((value) => Navigator.pop(context));
+              },
+              child: Text('Sign Out'),
+            ),
+          ),
+        ),
       ),
     );
   }
