@@ -1,5 +1,12 @@
 class User {
-  final String uID;
-  final String fullName;
-  User({this.uID , this.fullName});
+  String uID;
+  String fullName;
+  User({
+    this.uID,
+    this.fullName,
+  });
+  setter(String uid,String fullname) {
+    uID = uid;
+    fullName = fullname;
+  }
 }

@@ -16,7 +16,6 @@ class _CircleScaleState extends State<CircleScale>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      // value: .1,
       lowerBound: .2,
       upperBound: 1,
       duration: const Duration(milliseconds: 2000),
@@ -45,7 +44,6 @@ class _CircleScaleState extends State<CircleScale>
       ),
       builder: (BuildContext context, Widget child) {
         return ScaleTransition(
-          // angle: _controller.value * math.pi,
           scale: _animator,
           child: child,
         );

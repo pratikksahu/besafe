@@ -1,15 +1,32 @@
-import 'package:besafe/model/user.dart';
+import 'package:besafe/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final User user;
-  HomePage({this.user});
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool loaded = false;
+  FirebaseUser result;
+
+  Future setUser() async{
+    result =  await FirebaseAuth.instance.currentUser();
+  }
+  @override
+  void initState() {
+    if(result != null){
+      loaded = true;
+    }
+    else{
+      loaded = false;
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    
     Future<bool> _onBackPressed() {
       return showDialog(
             context: context,
@@ -30,7 +47,7 @@ class HomePage extends StatelessWidget {
                 SizedBox(height: 16),
                 new GestureDetector(
                   onTap: () async {
-                    await _auth.signOut();
+                    await AuthService().signOut();
                     Navigator.of(context).pop(true);
                   },
                   child: Container(
@@ -51,19 +68,23 @@ class HomePage extends StatelessWidget {
       onWillPop: _onBackPressed,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          appBar: AppBar(
-            title: Text('Welcome ${user.fullName}'),
-          ),
-          body: Center(
-            child: FlatButton(
-              onPressed: () async {
-                await _auth.signOut().then((value) => Navigator.pop(context));
-              },
-              child: Text('Sign Out'),
-            ),
-          ),
-        ),
+        home: loaded
+            ? Scaffold(
+                appBar: AppBar(
+                  title: Text('Welcome ${result.phoneNumber}'),
+                ),
+                body: Center(
+                  child: FlatButton(
+                    onPressed: () async {
+                      await AuthService()
+                          .signOut()
+                          .then((value) => Navigator.pop(context));
+                    },
+                    child: Text('Sign Out'),
+                  ),
+                ),
+              )
+            : CircularProgressIndicator(),
       ),
     );
   }

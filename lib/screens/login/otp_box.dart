@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 class OtpBox extends StatefulWidget {
 
-  final Function logger;
-  OtpBox({this.logger});
   @override
   _OtpBoxState createState() => _OtpBoxState();
 }
@@ -15,7 +13,6 @@ class _OtpBoxState extends State<OtpBox> with TickerProviderStateMixin {
   Animation<double> _animator;
   @override
   void initState() {
-    superLogger = widget.logger;
     super.initState();
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
@@ -54,7 +51,6 @@ class _OtpBoxState extends State<OtpBox> with TickerProviderStateMixin {
             ),
           ),
           onChanged: (otp) {
-            superLogger(otp);
           },
         ),
       ),

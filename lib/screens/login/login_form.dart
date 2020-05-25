@@ -1,26 +1,88 @@
-import 'package:besafe/model/user.dart';
-import 'package:besafe/screens/home/home_page.dart';
-import 'package:besafe/screens/login/otp_box.dart';
+import 'package:besafe/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 
-import '../../adminDashboard.dart';
+String otp = '';
 
-class LoginDetail extends StatefulWidget {
+class OtpBox extends StatefulWidget {
   @override
-  _LoginDetailState createState() => _LoginDetailState();
+  _OtpBoxState createState() => _OtpBoxState();
 }
 
-class _LoginDetailState extends State<LoginDetail> {
-  String fName, lname, phone, smsCode, fullName;
-  bool otpBox = false;
-  String otp;
+class _OtpBoxState extends State<OtpBox> with TickerProviderStateMixin {
+  AnimationController _controller;
+  Animation<double> _animator;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _animator = CurvedAnimation(parent: _controller, curve: Curves.bounceInOut);
+    _controller.forward();
+  }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      child: Container(
+        padding: EdgeInsets.only(
+          left: 30,
+          right: 30,
+          bottom: 20,
+        ),
+        width: 300,
+        child: TextField(
+          decoration: InputDecoration(
+            labelText: 'OTP',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 10.0,
+              vertical: 10.0,
+            ),
+          ),
+          onChanged: (value) {
+            otp = value;
+          },
+        ),
+      ),
+      builder: (BuildContext context, Widget child) {
+        return ScaleTransition(
+          // angle: _controller.value * math.pi,
+          scale: _animator,
+          child: child,
+        );
+      },
+    );
+  }
+}
+
+class LoginForm extends StatefulWidget {
+  @override
+  _LoginFormState createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  String fName, lname, phone = '', fullName;
+  bool otpBox = false;
+  String verificationID;
 
   Alignment childAlignment = Alignment.bottomCenter;
   @override
   void initState() {
     KeyboardVisibilityNotification().addNewListener(
+      // This helps to push login card up and down
       onChange: (bool visible) {
         setState(() {
           childAlignment =
@@ -29,25 +91,6 @@ class _LoginDetailState extends State<LoginDetail> {
       },
     );
     super.initState();
-  }
-
-  void setOtp(String otpKey) {
-    this.otp = otpKey;
-  }
-
-  void setNavigator(User user) async {
-    if (user != null) {
-      User result = User(uID: user.uID , fullName: fullName);
-      print('setNavigator ${result.runtimeType}');
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => HomePage(
-            user: result,
-          ),
-        ),
-      );
-    }
   }
 
   @override
@@ -139,23 +182,25 @@ class _LoginDetailState extends State<LoginDetail> {
                   },
                 ),
               ),
-              otpBox ? OtpBox(logger: setOtp) : SizedBox(),
+              otpBox ? OtpBox() : SizedBox(),
               RaisedButton(
                 color: Colors.amber,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
                 ),
-                child: Text(
-                  'Sign In',
-                  style: TextStyle(fontSize: 17.0),
-                ),
-                onPressed: () async {
-                  // setState(() {
-                  //   fullName = fName +' '+lname;
-                  //   otpBox = true;
-                  // });
-                  // Authenticator(otp, setNavigator).phoneVerify(phone);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AdminDashboard(),));
+                child: otpBox
+                    ? Text(
+                        'Verify',
+                        style: TextStyle(fontSize: 17.0),
+                      )
+                    : Text(
+                        'Sign In',
+                        style: TextStyle(fontSize: 17.0),
+                      ),
+                onPressed: () {
+                  otpBox
+                      ? AuthService().signInWithOTP(otp, verificationID)
+                      : verifyPhone(phone);
                 },
               ),
               Container(
@@ -176,6 +221,36 @@ class _LoginDetailState extends State<LoginDetail> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> verifyPhone(String phone) async {
+    final PhoneVerificationCompleted verificationComplete =
+        (AuthCredential authCred) {
+      AuthService().signIn(authCred);
+    };
+
+    final PhoneVerificationFailed verificationFailed = (AuthException exc) {
+      print('Error ${exc.message}');
+    };
+
+    final PhoneCodeSent codeSent = (String vFID, [int forceResend]) {
+      verificationID = vFID;
+      setState(() => otpBox = true);
+    };
+
+    final PhoneCodeAutoRetrievalTimeout autoTimeout = (String vFID) {
+      verificationID = vFID;
+      print('TimeOut $verificationID');
+    };
+
+    FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: '+91' + phone,
+      timeout: Duration(milliseconds: 20000),
+      verificationCompleted: verificationComplete,
+      verificationFailed: verificationFailed,
+      codeSent: codeSent,
+      codeAutoRetrievalTimeout: autoTimeout,
     );
   }
 }
