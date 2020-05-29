@@ -1,3 +1,4 @@
+import 'package:besafe/model/user.dart';
 import 'package:besafe/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -74,9 +75,12 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  String fName, lname, phone = '', fullName;
   bool otpBox = false;
   String verificationID;
+
+  TextEditingController firstName = TextEditingController(),
+      lastName = TextEditingController(),
+      phoneNumber = TextEditingController();
 
   Alignment childAlignment = Alignment.bottomCenter;
   @override
@@ -118,6 +122,7 @@ class _LoginFormState extends State<LoginForm> {
                 ),
                 width: 300,
                 child: TextField(
+                  controller: firstName,
                   textCapitalization: TextCapitalization.words,
                   decoration: InputDecoration(
                     labelText: 'First Name',
@@ -129,9 +134,6 @@ class _LoginFormState extends State<LoginForm> {
                       vertical: 10.0,
                     ),
                   ),
-                  onChanged: (value) {
-                    this.fName = value.toString();
-                  },
                 ),
               ),
               Container(
@@ -142,6 +144,7 @@ class _LoginFormState extends State<LoginForm> {
                 ),
                 width: 300,
                 child: TextField(
+                  controller: lastName,
                   textCapitalization: TextCapitalization.words,
                   decoration: InputDecoration(
                     labelText: 'Last Name',
@@ -153,9 +156,6 @@ class _LoginFormState extends State<LoginForm> {
                       vertical: 10.0,
                     ),
                   ),
-                  onChanged: (value) {
-                    this.lname = value.toString();
-                  },
                 ),
               ),
               Container(
@@ -167,6 +167,7 @@ class _LoginFormState extends State<LoginForm> {
                 ),
                 width: 300,
                 child: TextField(
+                  controller: phoneNumber,
                   decoration: InputDecoration(
                     labelText: 'Phone',
                     border: OutlineInputBorder(
@@ -177,30 +178,42 @@ class _LoginFormState extends State<LoginForm> {
                       vertical: 10.0,
                     ),
                   ),
-                  onChanged: (value) {
-                    this.phone = value.toString();
-                  },
                 ),
               ),
               otpBox ? OtpBox() : SizedBox(),
-              RaisedButton(
-                color: Colors.amber,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: otpBox
-                    ? Text(
-                        'Verify',
-                        style: TextStyle(fontSize: 17.0),
-                      )
-                    : Text(
-                        'Sign In',
-                        style: TextStyle(fontSize: 17.0),
-                      ),
-                onPressed: () {
-                  otpBox
-                      ? AuthService().signInWithOTP(otp, verificationID)
-                      : verifyPhone(phone);
+              Builder(
+                builder: (BuildContext loginButtonContext) {
+                  return RaisedButton(
+                    color: Colors.amber,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: otpBox
+                        ? Text(
+                            'Verify',
+                            style: TextStyle(fontSize: 17.0),
+                          )
+                        : Text(
+                            'Sign In',
+                            style: TextStyle(fontSize: 17.0),
+                          ),
+                    onPressed: () {
+                      if (firstName.text != null &&
+                          lastName.text != null &&
+                          phoneNumber.text != null) {
+                        User user = new User();
+                        user.fullName = firstName.text + ' ' + lastName.text;
+                        user.phoneNumber = phoneNumber.text;
+
+                        otpBox
+                            ? AuthService(context: loginButtonContext)
+                                .signInWithOTP(otp, verificationID, user)
+                            : verifyPhone(user, loginButtonContext);
+                          
+                      }
+                      // Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage()));
+                    },
+                  );
                 },
               ),
               Container(
@@ -224,10 +237,10 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  Future<void> verifyPhone(String phone) async {
+  Future<void> verifyPhone(User user, BuildContext loginButtonContext) async {
     final PhoneVerificationCompleted verificationComplete =
         (AuthCredential authCred) {
-      AuthService().signIn(authCred);
+      AuthService(context: loginButtonContext).signIn(authCred, user);
     };
 
     final PhoneVerificationFailed verificationFailed = (AuthException exc) {
@@ -245,8 +258,8 @@ class _LoginFormState extends State<LoginForm> {
     };
 
     FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: '+91' + phone,
-      timeout: Duration(milliseconds: 20000),
+      phoneNumber:'+91' + user.phoneNumber,
+      timeout: Duration(milliseconds: 60000),
       verificationCompleted: verificationComplete,
       verificationFailed: verificationFailed,
       codeSent: codeSent,
