@@ -78,7 +78,7 @@ class _CovidStatusState extends State<CovidStatus> {
       isLoading = true;
     });
     getDistrictDetailsFromDate(date.toString());
-    getStateDetailsFromDate(date.toString(), 1);
+    getStateDetailsFromDate(date.toString());
   }
 
   getDistrictDetailsFromDate(String date) {
@@ -93,90 +93,66 @@ class _CovidStatusState extends State<CovidStatus> {
     });
   }
 
-  getStateDetailsFromDate(String date, int switcher) {
+  getStateDetailsFromDate(String date) {
     print('Inside method getStateDetailsFromDate');
 
-    if (switcher == 1) {
-      var parseDate = DateTime.parse(date);
-      String qdate = parseDate.day < 10
-          ? ('0' + parseDate.day.toString())
-          : parseDate.day.toString();
+    var parseDate = DateTime.parse(date);
+    String qdate = parseDate.day < 10
+        ? ('0' + parseDate.day.toString())
+        : parseDate.day.toString();
 
-      String qyear = (parseDate.year ~/ 100).toString();
-      List<String> qmonth = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ];
+    String qyear = (parseDate.year ~/ 100).toString();
+    List<String> qmonth = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
 
-      var formattedDate = '$qdate-${qmonth[parseDate.month - 1]}-$qyear';
+    var formattedDate = '$qdate-${qmonth[parseDate.month - 1]}-$qyear';
 
-      setState(() {
-        confirmed = 0;
-        recovered = 0;
-        deceased = 0;
-        for (var i in affectedData) {
-          if (i.date != formattedDate) {
-            if (i.status == 'Confirmed') {
-              confirmed +=
-                  int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
-            }
-            if (i.status == 'Recovered') {
-              recovered +=
-                  int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
-            }
-            if (i.status == 'Deceased') {
-              deceased +=
-                  int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
-            }
-            // ofDateSelected.add(i);
+    setState(() {
+      int temp = 0;
+      isLoading = true;
+      confirmed = 0;
+      recovered = 0;
+      deceased = 0;
+      for (var i in affectedData) {
+        if (i.date != formattedDate) {
+          temp++;
+          if (i.status == 'Confirmed') {
+            confirmed += int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
+          }
+          if (i.status == 'Recovered') {
+            recovered += int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
+          }
+          if (i.status == 'Deceased') {
+            deceased += int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
           }
         }
-        isLoading = false;
-        showingDateOnScreen = formattedDate;
-      });
-      print('Date showing on screen $showingDateOnScreen');
-      print('Inside method getStateDetailsFromDate task done');
-      getPointsConfirmed(showingDateOnScreen); // To get line chart x y points
-
-    } else {
-      setState(() {
-        confirmed = 0;
-        recovered = 0;
-        deceased = 0;
-        for (var i in affectedData) {
-          if (i.date != date) {
-            if (i.status == 'Confirmed') {
-              confirmed +=
-                  int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
-            }
-            if (i.status == 'Recovered') {
-              recovered +=
-                  int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
-            }
-            if (i.status == 'Deceased') {
-              deceased +=
-                  int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
-            }
-            // ofDateSelected.add(i);
-          }
-        }
-        isLoading = false;
-        showingDateOnScreen = date;
-      });
-      print('Date showing on screen $showingDateOnScreen');
-      print('Inside method getStateDetailsFromDate task done');
-      getPointsConfirmed(showingDateOnScreen);
-    }
+      }
+      if (temp < affectedData.length) {
+        confirmed += int.parse(
+            affectedData[temp].stateCode[stateChosen.code.toLowerCase()]);
+        recovered += int.parse(
+            affectedData[temp + 1].stateCode[stateChosen.code.toLowerCase()]);
+        deceased += int.parse(
+            affectedData[temp + 2].stateCode[stateChosen.code.toLowerCase()]);
+      }
+      isLoading = false;
+      showingDateOnScreen = formattedDate;
+    });
+    print('Date showing on screen $showingDateOnScreen');
+    print('Inside method getStateDetailsFromDate task done');
+    getPointsConfirmed(showingDateOnScreen); // To get line chart x y points
   }
 
   //Finds the State which was chosen from list and stores its district list
@@ -256,8 +232,7 @@ class _CovidStatusState extends State<CovidStatus> {
         .stateChosen; // containes code which is used to get data from affectedData obj
     print('State received in covid_status ${stateChosen.name}');
     districtsAffected = widget.districtsAffected;
-    latestStateDataDated = affectedData[affectedData.length - 1].date;
-    getStateDetailsFromDate(latestStateDataDated, 2);
+    getStateDetailsFromDate(DateTime.now().toString());
 
     getDistrictDetailsFromDate(DateTime.now().toString());
     findTheDistricts(stateChosen);
@@ -471,13 +446,13 @@ class _CovidStatusState extends State<CovidStatus> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         districtListInsideColumn(
-                            caseList.confirmed.toString(), Color(0xFFFF8748)),
+                            caseList.confirmed.toString(), Color(0xFFFF8748) ,'P'),
                         districtListInsideColumn(
-                            caseList.active.toString(), Color(0xFFFF4848)),
+                            caseList.active.toString(), Color(0xFFFF4848) , 'A'),
                         districtListInsideColumn(
-                            caseList.recovered.toString(), Color(0xFF36C12C)),
+                            caseList.recovered.toString(), Color(0xFF36C12C),'R'),
                         districtListInsideColumn(
-                            caseList.deceased.toString(), Color(0xFFFF0000)),
+                            caseList.deceased.toString(), Color(0xFFFF0000),'D'),
                       ],
                     ),
                   ),
@@ -490,7 +465,7 @@ class _CovidStatusState extends State<CovidStatus> {
     return list;
   }
 
-  districtListInsideColumn(cases, color) {
+  districtListInsideColumn(cases, color , subTitle) {
     return Column(
       children: <Widget>[
         Text(
@@ -501,7 +476,7 @@ class _CovidStatusState extends State<CovidStatus> {
           height: 1,
         ),
         Text(
-          'C',
+          subTitle,
           style: TextStyle(
             fontSize: 13,
             color: color,
@@ -520,10 +495,11 @@ class _CovidStatusState extends State<CovidStatus> {
               Container(
                 padding: EdgeInsets.all(6.0),
                 width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * .28,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    containerCardConfirmed('Confirmed',
+                    containerCardConfirmed('Positive',
                         '${confirmed.toString()}'), // using stateChosen code
                     containerCardRecovered(
                         'Recovered', '${recovered.toString()}'),
@@ -550,11 +526,26 @@ class _CovidStatusState extends State<CovidStatus> {
   }
 
   containerCardConfirmed(String status, String numbers) {
-    return Container(
-      width: MediaQuery.of(context).size.width * .3,
-      height: MediaQuery.of(context).size.height * .25,
-      child: Card(
-        elevation: 8.0,
+    return ClipRRect(
+      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10)),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 6.0, left: 6.0),
+        width: MediaQuery.of(context).size.width * .3,
+        height: MediaQuery.of(context).size.height * .25,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              offset: Offset(0.0, 1.0), //(x,y)
+              blurRadius: 6.0,
+            ),
+          ],
+          border: Border.all(width: 2, color: Colors.white),
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(10),
+          ),
+        ),
         child: Column(
           children: <Widget>[
             Text(
@@ -596,7 +587,7 @@ class _CovidStatusState extends State<CovidStatus> {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: RichText(
                       text: TextSpan(
-                        text: "Confirmed",
+                        text: status,
                         style:
                             TextStyle(color: Color(0xFFFF8748), fontSize: 15),
                       ),
@@ -612,11 +603,26 @@ class _CovidStatusState extends State<CovidStatus> {
   }
 
   containerCardRecovered(String status, String numbers) {
-    return Container(
-      width: MediaQuery.of(context).size.width * .3,
-      height: MediaQuery.of(context).size.height * .25,
-      child: Card(
-        elevation: 8.0,
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(10),
+        bottomRight: Radius.circular(10),
+      ),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 6.0),
+        width: MediaQuery.of(context).size.width * .3,
+        height: MediaQuery.of(context).size.height * .25,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              offset: Offset(0.0, 1.0), //(x,y)
+              blurRadius: 6.0,
+            ),
+          ],
+          border: Border.all(width: 2, color: Colors.white),
+        ),
         child: Column(
           children: <Widget>[
             Text(
@@ -675,11 +681,28 @@ class _CovidStatusState extends State<CovidStatus> {
   }
 
   containerCardDeceased(String status, String numbers) {
-    return Container(
-      width: MediaQuery.of(context).size.width * .3,
-      height: MediaQuery.of(context).size.height * .25,
-      child: Card(
-        elevation: 8.0,
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+        bottomRight: Radius.circular(10),
+      ),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 6.0, right: 6.0),
+        width: MediaQuery.of(context).size.width * .3,
+        height: MediaQuery.of(context).size.height * .25,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              offset: Offset(0.0, 1.0), //(x,y)
+              blurRadius: 6.0,
+            ),
+          ],
+          border: Border.all(width: 2, color: Colors.white),
+          borderRadius: BorderRadius.only(
+            bottomRight: Radius.circular(10),
+          ),
+        ),
         child: Column(
           children: <Widget>[
             Text(
@@ -764,5 +787,4 @@ class _CovidStatusState extends State<CovidStatus> {
         ),
       ],
     );
-  }
-}
+  }}
