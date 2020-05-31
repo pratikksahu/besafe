@@ -29,3 +29,24 @@ class AcrossIndia {
     );
   }
 }
+
+class StateWise {
+  String active;
+  String confirmed;
+  String deaths;
+  String state;
+  StateWise({
+    this.active,
+    this.confirmed,
+    this.deaths,
+    this.state,
+  });
+  factory StateWise.fromJson(Map<String, dynamic> parsedJson) {
+    return StateWise(
+      active: parsedJson['active'],
+      confirmed: parsedJson['confirmed'],
+      deaths: parsedJson['active'],
+      state: parsedJson['state'],
+    );
+  }
+}

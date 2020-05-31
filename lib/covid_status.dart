@@ -192,23 +192,20 @@ class _CovidStatusState extends State<CovidStatus> {
           conf++;
           double y =
               double.parse(element.stateCode[stateChosen.code.toLowerCase()]);
-
-          confirmedSpotxy.add(FlSpot(conf, y));
+          if (conf % 3 == 0) confirmedSpotxy.add(FlSpot(conf, y));
         }
 
         if (element.status == 'Recovered') {
           recov++;
           double y =
               double.parse(element.stateCode[stateChosen.code.toLowerCase()]);
-
-          recoveredSpotxy.add(FlSpot(recov, y));
+          if (recov % 3 == 0) recoveredSpotxy.add(FlSpot(recov, y));
         }
         if (element.status == 'Deceased') {
           dece++;
           double y =
               double.parse(element.stateCode[stateChosen.code.toLowerCase()]);
-
-          deceasedSpotxy.add(FlSpot(dece, y));
+          if (dece % 3 == 0) deceasedSpotxy.add(FlSpot(dece, y));
         }
       }
     }
@@ -249,25 +246,38 @@ class _CovidStatusState extends State<CovidStatus> {
           physics: AlwaysScrollableScrollPhysics(),
           slivers: <Widget>[
             SliverAppBar(
+              floating: true,
+              pinned: true,
+              snap: false,
               centerTitle: true,
+              backgroundColor: Colors.amberAccent,
               title: Container(
                 height: 100,
                 margin: EdgeInsets.only(
                   top: 40,
                 ),
-                child: Column(
-                  children: <Widget>[
-                    Text(stateChosen.name),
-                    Text(
-                      'As Of $showingDateOnScreen',
-                      style: TextStyle(
-                        fontSize: 20.0,
+                child: ClipRRect(
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        stateChosen.name,
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                          color: Colors.black,
+                        ),
+                        overflow: TextOverflow.fade,
                       ),
-                    ),
-                  ],
+                      Text(
+                        'As Of $showingDateOnScreen',
+                        style: TextStyle(fontSize: 20.0, color: Colors.black),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              expandedHeight: 120,
+              expandedHeight: 100,
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.date_range),
@@ -402,61 +412,78 @@ class _CovidStatusState extends State<CovidStatus> {
         if (caseList.date == dateForDistrictData)
           list.add(Column(
             children: <Widget>[
-              Divider(
-                thickness: 2,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    width: MediaQuery.of(context).size.width * .4,
-                    height: MediaQuery.of(context).size.height * .05,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * .3 * .1,
-                        ),
-                        CircleAvatar(
-                          radius: 5,
-                          backgroundColor: zoneColor,
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * .3 * .1,
-                        ),
-                        Flexible(
-                          child: Container(
-                            child: Text(
-                              district.districtName,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+              Container(
+                margin: EdgeInsets.only(
+                  left: 13,
+                  right: 13,
+                ),
+                padding: EdgeInsets.only(
+                  top: 3,
+                  bottom: 3,
+                ),
+                decoration: BoxDecoration(
+                    border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey,
+                  ),
+                )),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Container(
+                      width: MediaQuery.of(context).size.width * .4,
+                      height: MediaQuery.of(context).size.height * .05,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * .3 * .1,
+                          ),
+                          CircleAvatar(
+                            radius: 5,
+                            backgroundColor: zoneColor,
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * .3 * .1,
+                          ),
+                          Flexible(
+                            child: Container(
+                              child: Text(
+                                district.districtName,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.fade,
                               ),
-                              overflow: TextOverflow.fade,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * .45,
-                    margin: EdgeInsets.only(right: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        districtListInsideColumn(
-                            caseList.confirmed.toString(), Color(0xFFFF8748) ,'P'),
-                        districtListInsideColumn(
-                            caseList.active.toString(), Color(0xFFFF4848) , 'A'),
-                        districtListInsideColumn(
-                            caseList.recovered.toString(), Color(0xFF36C12C),'R'),
-                        districtListInsideColumn(
-                            caseList.deceased.toString(), Color(0xFFFF0000),'D'),
-                      ],
+                    Container(
+                      width: MediaQuery.of(context).size.width * .45,
+                      margin: EdgeInsets.only(right: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          districtListInsideColumn(
+                              caseList.confirmed.toString(),
+                              Color(0xFFFF8748),
+                              'P'),
+                          districtListInsideColumn(caseList.active.toString(),
+                              Color(0xFFFF4848), 'A'),
+                          districtListInsideColumn(
+                              caseList.recovered.toString(),
+                              Color(0xFF36C12C),
+                              'R'),
+                          districtListInsideColumn(caseList.deceased.toString(),
+                              Color(0xFFFF0000), 'D'),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ));
@@ -465,7 +492,7 @@ class _CovidStatusState extends State<CovidStatus> {
     return list;
   }
 
-  districtListInsideColumn(cases, color , subTitle) {
+  districtListInsideColumn(cases, color, subTitle) {
     return Column(
       children: <Widget>[
         Text(
@@ -787,4 +814,5 @@ class _CovidStatusState extends State<CovidStatus> {
         ),
       ],
     );
-  }}
+  }
+}

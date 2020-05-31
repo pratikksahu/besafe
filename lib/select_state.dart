@@ -38,7 +38,7 @@ class _SelectStateState extends State<SelectState> {
   List<String> dropDown = new List<String>();
   String selectedState;
   AcrossIndia todayData;
-
+  List<StateWise> todayStateData;
   //
 
   //Parsing AcrossIndia data
@@ -49,6 +49,24 @@ class _SelectStateState extends State<SelectState> {
     AcrossIndia today =
         AcrossIndia.fromJson(list['cases_time_series'][lengthOfStats - 1]);
     return today;
+  }
+
+  //Parsing ends
+
+  //Parsing AcrossIndia data
+  Future<List<StateWise>> getAcrossIndiaStateStats() async {
+    var response = await http.get(acrossIndiaUrl);
+    var list = json.decode(response.body);
+    List<StateWise> today = parsedStateWiseStatsList(list['statewise']);
+    return today;
+  }
+
+  parsedStateWiseStatsList(list) {
+    List<StateWise> temp = [];
+    list.forEach((element) {
+      temp.add(StateWise.fromJson(element));
+    });
+    return temp;
   }
   //Parsing ends
 
@@ -139,8 +157,11 @@ class _SelectStateState extends State<SelectState> {
             affectedDistrictZoneData = value;
             getAcrossIndiaStats().then((value) {
               todayData = value;
-              setState(() {
-                isLoading = false;
+              getAcrossIndiaStateStats().then((value) {
+                todayStateData = value;
+                setState(() {
+                  isLoading = false;
+                });
               });
             });
           });
@@ -160,9 +181,11 @@ class _SelectStateState extends State<SelectState> {
         body: !isLoading
             ? CustomScrollView(
                 // physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
                 slivers: <Widget>[
                   SliverAppBar(
+                    floating: false,
+                    pinned: true,
+                    snap: false,
                     title: Text(
                       'BeSafe',
                       style: TextStyle(color: Colors.black),
@@ -196,13 +219,14 @@ class _SelectStateState extends State<SelectState> {
                             child: Column(
                               children: <Widget>[
                                 Container(
-                                  padding: EdgeInsets.all(3),
+                                  padding: EdgeInsets.all(4),
                                   alignment: Alignment.center,
                                   width: MediaQuery.of(context).size.width * .7,
                                   decoration: BoxDecoration(
-                                      color: Colors.amberAccent,
-                                      borderRadius: BorderRadius.circular(5)),
-                                  margin: EdgeInsets.only(bottom: 5),
+                                    color: Colors.amberAccent,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  margin: EdgeInsets.only(bottom: 7, top: 4),
                                   child: Text(
                                     'Across India status',
                                     style: TextStyle(
@@ -425,13 +449,16 @@ class _SelectStateState extends State<SelectState> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: FlatButton(
-                              onPressed: () {},
+                          InkWell(
+                            onTap: () {},
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: MediaQuery.of(context).size.height * .06,
+                              width: MediaQuery.of(context).size.width * .33,
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                               child: Text(
                                 'Report',
                                 style: TextStyle(
@@ -441,13 +468,16 @@ class _SelectStateState extends State<SelectState> {
                           ),
                           SizedBox(
                               width: MediaQuery.of(context).size.width * .2),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.greenAccent,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: FlatButton(
-                              onPressed: () {},
+                          InkWell(
+                            onTap: () {},
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: MediaQuery.of(context).size.height * .06,
+                              width: MediaQuery.of(context).size.width * .33,
+                              decoration: BoxDecoration(
+                                color: Colors.greenAccent,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                               child: Text(
                                 'Precautions',
                                 style: TextStyle(
@@ -458,15 +488,27 @@ class _SelectStateState extends State<SelectState> {
                         ],
                       ),
                       Container(
-                        margin: EdgeInsets.all(15),
-                        child: Text(
-                          'Select State for more information',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                          margin: EdgeInsets.all(18),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                'Select State for more information',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'Active',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          )),
                     ]),
                   ),
                   SliverList(
@@ -492,7 +534,14 @@ class _SelectStateState extends State<SelectState> {
 
   stateSelectList() {
     List<Widget> temp = [];
+    StateWise activeInState;
     for (var i = 0; i < stateInfo.length; i++) {
+      for (var todayState in todayStateData) {
+        if (todayState.state == stateInfo[i].name) {
+          activeInState = todayState;
+          break;
+        }
+      }
       temp.add(
         InkWell(
           borderRadius: BorderRadius.circular(5),
@@ -534,6 +583,7 @@ class _SelectStateState extends State<SelectState> {
                 ),
               ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Container(
                     alignment: Alignment.centerLeft,
@@ -542,6 +592,19 @@ class _SelectStateState extends State<SelectState> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(right: 20),
+                    child: Text(
+                      activeInState.active,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: Colors.grey,
+                        letterSpacing: 1,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
