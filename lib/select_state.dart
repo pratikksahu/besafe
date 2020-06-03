@@ -347,7 +347,7 @@ class _SelectStateState extends State<SelectState> {
                                                       ),
                                                       Text(
                                                         todayData
-                                                            .dailyconfirmed,
+                                                            .dailyrecovered,
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           letterSpacing: 1,
@@ -413,7 +413,7 @@ class _SelectStateState extends State<SelectState> {
                                                       ),
                                                       Text(
                                                         todayData
-                                                            .dailyconfirmed,
+                                                            .dailydeceased,
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           letterSpacing: 1,
