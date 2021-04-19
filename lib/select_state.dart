@@ -8,6 +8,7 @@ import 'Json/stateslist.dart';
 import 'covid_status.dart';
 import 'dart:convert';
 import 'dart:async';
+import 'services/auth_service.dart';
 
 class SelectState extends StatefulWidget {
   @override
