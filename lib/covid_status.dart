@@ -39,6 +39,10 @@ class _CovidStatusState extends State<CovidStatus> {
       stateChosen; // It contains basic information about state , like capital and state code
   List<AffectedData> ofDateSelected =
       []; // To get The details inside Card , all cases till date
+
+  int confirmed,
+      recovered,
+      deceased; // To get The details inside Card , all cases till date
   List<StateNameOfDistricts> districtsAffected = [];
   List<DistrictZone> districtZone =
       []; // This stores green , red and orange zone data of each district
@@ -62,6 +66,8 @@ class _CovidStatusState extends State<CovidStatus> {
     const Color(0xff02d39a),
   ];
 
+  bool isLoading = true;
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
@@ -71,9 +77,10 @@ class _CovidStatusState extends State<CovidStatus> {
     );
     setState(() {
       date = picked ?? date;
+      isLoading = true;
     });
     getDistrictDetailsFromDate(date.toString());
-    getStateDetailsFromDate(date.toString(), 1);
+    getStateDetailsFromDate(date.toString());
   }
 
   getDistrictDetailsFromDate(String date) {
@@ -88,59 +95,66 @@ class _CovidStatusState extends State<CovidStatus> {
     });
   }
 
-  getStateDetailsFromDate(String date, int switcher) {
+  getStateDetailsFromDate(String date) {
     print('Inside method getStateDetailsFromDate');
 
-    ofDateSelected = [];
-    if (switcher == 1) {
-      var parseDate = DateTime.parse(date);
-      String qdate = parseDate.day < 10
-          ? ('0' + parseDate.day.toString())
-          : parseDate.day.toString();
+    var parseDate = DateTime.parse(date);
+    String qdate = parseDate.day < 10
+        ? ('0' + parseDate.day.toString())
+        : parseDate.day.toString();
 
-      String qyear = (parseDate.year ~/ 100).toString();
-      List<String> qmonth = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ];
+    String qyear = (parseDate.year ~/ 100).toString();
+    List<String> qmonth = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
 
-      var formattedDate = '$qdate-${qmonth[parseDate.month - 1]}-$qyear';
+    var formattedDate = '$qdate-${qmonth[parseDate.month - 1]}-$qyear';
 
-      setState(() {
-        for (var i in affectedData) {
-          if (i.date == formattedDate) {
-            ofDateSelected.add(i);
+    setState(() {
+      int temp = 0;
+      isLoading = true;
+      confirmed = 0;
+      recovered = 0;
+      deceased = 0;
+      for (var i in affectedData) {
+        if (i.date != formattedDate) {
+          temp++;
+          if (i.status == 'Confirmed') {
+            confirmed += int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
+          }
+          if (i.status == 'Recovered') {
+            recovered += int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
+          }
+          if (i.status == 'Deceased') {
+            deceased += int.parse(i.stateCode[stateChosen.code.toLowerCase()]);
           }
         }
-        showingDateOnScreen = formattedDate;
-      });
-      print('Date showing on screen $showingDateOnScreen');
-      print('Inside method getStateDetailsFromDate task done');
-      getPointsConfirmed(showingDateOnScreen); // To get line chart x y points
-
-    } else {
-      setState(() {
-        for (var i in affectedData) {
-          if (i.date == date) {
-            ofDateSelected.add(i);
-          }
-        }
-        showingDateOnScreen = date;
-      });
-      print('Date showing on screen $showingDateOnScreen');
-      print('Inside method getStateDetailsFromDate task done');
-      getPointsConfirmed(showingDateOnScreen);
-    }
+      }
+      if (temp < affectedData.length) {
+        confirmed += int.parse(
+            affectedData[temp].stateCode[stateChosen.code.toLowerCase()]);
+        recovered += int.parse(
+            affectedData[temp + 1].stateCode[stateChosen.code.toLowerCase()]);
+        deceased += int.parse(
+            affectedData[temp + 2].stateCode[stateChosen.code.toLowerCase()]);
+      }
+      isLoading = false;
+      showingDateOnScreen = formattedDate;
+    });
+    print('Date showing on screen $showingDateOnScreen');
+    print('Inside method getStateDetailsFromDate task done');
+    getPointsConfirmed(showingDateOnScreen); // To get line chart x y points
   }
 
   //Finds the State which was chosen from list and stores its district list
@@ -168,40 +182,37 @@ class _CovidStatusState extends State<CovidStatus> {
   getPointsConfirmed(String date) {
     print('Inside method getPointsConfirmed');
 
-    recoveredSpotxy.clear();
     confirmedSpotxy.clear();
+    recoveredSpotxy.clear();
     deceasedSpotxy.clear();
     double conf = 0;
     double recov = 0;
     double dece = 0;
     for (var element in affectedData) {
       if (element.stateCode['date'] != date) {
-        if (element.stateCode['status'] == 'Confirmed') {
+        if (element.status == 'Confirmed') {
           conf++;
           double y =
               double.parse(element.stateCode[stateChosen.code.toLowerCase()]);
-
-          confirmedSpotxy.add(FlSpot(conf, y));
+          if (conf % 3 == 0) confirmedSpotxy.add(FlSpot(conf, y));
         }
 
         if (element.status == 'Recovered') {
           recov++;
           double y =
               double.parse(element.stateCode[stateChosen.code.toLowerCase()]);
-
-          recoveredSpotxy.add(FlSpot(recov, y));
+          if (recov % 3 == 0) recoveredSpotxy.add(FlSpot(recov, y));
         }
         if (element.status == 'Deceased') {
           dece++;
           double y =
               double.parse(element.stateCode[stateChosen.code.toLowerCase()]);
-
-          deceasedSpotxy.add(FlSpot(dece, y));
+          if (dece % 3 == 0) deceasedSpotxy.add(FlSpot(dece, y));
         }
       }
     }
     print('Retrieved x,y points successfully from getPointsConfirmed');
-    print(confirmedSpotxy.length);
+    // print(recoveredSpotxy.length);
 
     //Uncomment to show graph points
     // print(recoveredSpotxy);
@@ -220,8 +231,7 @@ class _CovidStatusState extends State<CovidStatus> {
         .stateChosen; // containes code which is used to get data from affectedData obj
     print('State received in covid_status ${stateChosen.name}');
     districtsAffected = widget.districtsAffected;
-    latestStateDataDated = affectedData[affectedData.length - 1].date;
-    getStateDetailsFromDate(latestStateDataDated, 2);
+    getStateDetailsFromDate(DateTime.now().toString());
 
     getDistrictDetailsFromDate(DateTime.now().toString());
     findTheDistricts(stateChosen);
@@ -238,25 +248,38 @@ class _CovidStatusState extends State<CovidStatus> {
           physics: AlwaysScrollableScrollPhysics(),
           slivers: <Widget>[
             SliverAppBar(
+              floating: true,
+              pinned: true,
+              snap: false,
               centerTitle: true,
+              backgroundColor: Colors.amberAccent,
               title: Container(
                 height: 100,
                 margin: EdgeInsets.only(
                   top: 40,
                 ),
-                child: Column(
-                  children: <Widget>[
-                    Text(stateChosen.name),
-                    Text(
-                      'As Of $showingDateOnScreen',
-                      style: TextStyle(
-                        fontSize: 20.0,
+                child: ClipRRect(
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        stateChosen.name,
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                          color: Colors.black,
+                        ),
+                        overflow: TextOverflow.fade,
                       ),
-                    ),
-                  ],
+                      Text(
+                        'As Of $showingDateOnScreen',
+                        style: TextStyle(fontSize: 20.0, color: Colors.black),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              expandedHeight: 120,
+              expandedHeight: 100,
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.date_range),
@@ -391,116 +414,77 @@ class _CovidStatusState extends State<CovidStatus> {
         if (caseList.date == dateForDistrictData)
           list.add(Column(
             children: <Widget>[
-              Divider(
-                thickness: 2,
-              ),
               Container(
-                width: MediaQuery.of(context).size.width,
-                height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  // color: Color.fromARGB(255, 255, 220, 120),
+                margin: EdgeInsets.only(
+                  left: 13,
+                  right: 13,
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Container(
-                        child: CircleAvatar(
-                          radius: 5,
-                          backgroundColor: zoneColor,
-                        ),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * .3,
-                        child: Text(
-                          district.districtName,
-                          style: TextStyle(fontSize: 10),
-                          overflow: TextOverflow.clip,
-                        ),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * .5,
-                        margin: EdgeInsets.only(right: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Column(
-                              children: <Widget>[
-                                Text(
-                                  caseList.confirmed.toString(),
-                                  style: TextStyle(fontSize: 10),
-                                ),
-                                Text(
-                                  'C',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Color(0xFFFF8748),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.fade,
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: <Widget>[
-                                Text(
-                                  caseList.active.toString(),
-                                  style: TextStyle(fontSize: 10),
-                                ),
-                                Text(
-                                  'A',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Color(0xFFFF4848),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.fade,
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: <Widget>[
-                                Text(
-                                  caseList.recovered.toString(),
-                                  style: TextStyle(fontSize: 10),
-                                ),
-                                Text(
-                                  'R',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Color(0xFF36C12C),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.fade,
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: <Widget>[
-                                Text(
-                                  caseList.deceased.toString(),
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                Text(
-                                  'D',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Color(0xFFFF0000),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.fade,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                padding: EdgeInsets.only(
+                  top: 3,
+                  bottom: 3,
+                ),
+                decoration: BoxDecoration(
+                    border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey,
                   ),
+                )),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Container(
+                      width: MediaQuery.of(context).size.width * .4,
+                      height: MediaQuery.of(context).size.height * .05,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * .3 * .1,
+                          ),
+                          CircleAvatar(
+                            radius: 5,
+                            backgroundColor: zoneColor,
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * .3 * .1,
+                          ),
+                          Flexible(
+                            child: Container(
+                              child: Text(
+                                district.districtName,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.fade,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * .45,
+                      margin: EdgeInsets.only(right: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          districtListInsideColumn(
+                              caseList.confirmed.toString(),
+                              Color(0xFFFF8748),
+                              'P'),
+                          districtListInsideColumn(caseList.active.toString(),
+                              Color(0xFFFF4848), 'A'),
+                          districtListInsideColumn(
+                              caseList.recovered.toString(),
+                              Color(0xFF36C12C),
+                              'R'),
+                          districtListInsideColumn(caseList.deceased.toString(),
+                              Color(0xFFFF0000), 'D'),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -510,22 +494,45 @@ class _CovidStatusState extends State<CovidStatus> {
     return list;
   }
 
+  districtListInsideColumn(cases, color, subTitle) {
+    return Column(
+      children: <Widget>[
+        Text(
+          cases,
+          style: TextStyle(fontSize: 13),
+        ),
+        SizedBox(
+          height: 1,
+        ),
+        Text(
+          subTitle,
+          style: TextStyle(
+            fontSize: 13,
+            color: color,
+            fontWeight: FontWeight.bold,
+          ),
+          overflow: TextOverflow.fade,
+        ),
+      ],
+    );
+  }
+
   threeCardWidget() {
-    return ofDateSelected.length != 0
+    return !isLoading
         ? Column(
             children: <Widget>[
               Container(
                 padding: EdgeInsets.all(6.0),
                 width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * .28,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    containerCardConfirmed('Confirmed',
-                        '${ofDateSelected[0].stateCode[stateChosen.code.toLowerCase()]}'), // using stateChosen code
-                    containerCardRecovered('Recovered',
-                        '${ofDateSelected[1].stateCode[stateChosen.code.toLowerCase()]}'),
-                    containerCardDeceased('Deceased',
-                        '${ofDateSelected[2].stateCode[stateChosen.code.toLowerCase()]}'),
+                    containerCardConfirmed('Positive',
+                        '${confirmed.toString()}'), // using stateChosen code
+                    containerCardRecovered(
+                        'Recovered', '${recovered.toString()}'),
+                    containerCardDeceased('Deceased', '${deceased.toString()}'),
                   ],
                 ),
               ),
@@ -548,11 +555,26 @@ class _CovidStatusState extends State<CovidStatus> {
   }
 
   containerCardConfirmed(String status, String numbers) {
-    return Container(
-      width: MediaQuery.of(context).size.width * .3,
-      height: MediaQuery.of(context).size.height * .25,
-      child: Card(
-        elevation: 8.0,
+    return ClipRRect(
+      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10)),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 6.0, left: 6.0),
+        width: MediaQuery.of(context).size.width * .3,
+        height: MediaQuery.of(context).size.height * .25,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              offset: Offset(0.0, 1.0), //(x,y)
+              blurRadius: 6.0,
+            ),
+          ],
+          border: Border.all(width: 2, color: Colors.white),
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(10),
+          ),
+        ),
         child: Column(
           children: <Widget>[
             Text(
@@ -594,7 +616,7 @@ class _CovidStatusState extends State<CovidStatus> {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: RichText(
                       text: TextSpan(
-                        text: "Confirmed",
+                        text: status,
                         style:
                             TextStyle(color: Color(0xFFFF8748), fontSize: 15),
                       ),
@@ -610,11 +632,26 @@ class _CovidStatusState extends State<CovidStatus> {
   }
 
   containerCardRecovered(String status, String numbers) {
-    return Container(
-      width: MediaQuery.of(context).size.width * .3,
-      height: MediaQuery.of(context).size.height * .25,
-      child: Card(
-        elevation: 8.0,
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(10),
+        bottomRight: Radius.circular(10),
+      ),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 6.0),
+        width: MediaQuery.of(context).size.width * .3,
+        height: MediaQuery.of(context).size.height * .25,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              offset: Offset(0.0, 1.0), //(x,y)
+              blurRadius: 6.0,
+            ),
+          ],
+          border: Border.all(width: 2, color: Colors.white),
+        ),
         child: Column(
           children: <Widget>[
             Text(
@@ -673,11 +710,28 @@ class _CovidStatusState extends State<CovidStatus> {
   }
 
   containerCardDeceased(String status, String numbers) {
-    return Container(
-      width: MediaQuery.of(context).size.width * .3,
-      height: MediaQuery.of(context).size.height * .25,
-      child: Card(
-        elevation: 8.0,
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+        bottomRight: Radius.circular(10),
+      ),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 6.0, right: 6.0),
+        width: MediaQuery.of(context).size.width * .3,
+        height: MediaQuery.of(context).size.height * .25,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              offset: Offset(0.0, 1.0), //(x,y)
+              blurRadius: 6.0,
+            ),
+          ],
+          border: Border.all(width: 2, color: Colors.white),
+          borderRadius: BorderRadius.only(
+            bottomRight: Radius.circular(10),
+          ),
+        ),
         child: Column(
           children: <Widget>[
             Text(

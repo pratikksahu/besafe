@@ -36,6 +36,7 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.3"
+<<<<<<< HEAD
   cloud_firestore:
     dependency: "direct main"
     description:
@@ -57,6 +58,8 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1+2"
+=======
+>>>>>>> 2dd75141dffdc60948433911eb692bc565976d0a
   collection:
     dependency: transitive
     description:
@@ -78,6 +81,7 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.4"
+<<<<<<< HEAD
   equatable:
     dependency: transitive
     description:
@@ -120,6 +124,22 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1+2"
+=======
+  cupertino_icons:
+    dependency: "direct main"
+    description:
+      name: cupertino_icons
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.3"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0"
+>>>>>>> 2dd75141dffdc60948433911eb692bc565976d0a
   fl_chart:
     dependency: "direct main"
     description:
@@ -137,11 +157,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+<<<<<<< HEAD
   flutter_web_plugins:
     dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.0"
+=======
+>>>>>>> 2dd75141dffdc60948433911eb692bc565976d0a
   http:
     dependency: "direct main"
     description:
@@ -163,6 +186,7 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.12"
+<<<<<<< HEAD
   js:
     dependency: transitive
     description:
@@ -177,6 +201,8 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.5.6"
+=======
+>>>>>>> 2dd75141dffdc60948433911eb692bc565976d0a
   matcher:
     dependency: transitive
     description:
@@ -226,6 +252,7 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.0"
+<<<<<<< HEAD
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -233,6 +260,8 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
+=======
+>>>>>>> 2dd75141dffdc60948433911eb692bc565976d0a
   quiver:
     dependency: transitive
     description:
@@ -310,4 +339,8 @@ packages:
     version: "3.6.1"
 sdks:
   dart: ">=2.7.0 <3.0.0"
+<<<<<<< HEAD
   flutter: ">=1.12.13+hotfix.4 <2.0.0"
+=======
+  flutter: ">=0.3.6 <2.0.0"
+>>>>>>> 2dd75141dffdc60948433911eb692bc565976d0a
