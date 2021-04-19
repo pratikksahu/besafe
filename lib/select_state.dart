@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'Json/affectedData.dart';
 import 'Json/districts.dart';
+import 'Json/districtzone.dart';
 import 'Json/stateslist.dart';
 import 'covid_status.dart';
 import 'services/auth_service.dart';
@@ -23,14 +24,35 @@ class _SelectStateState extends State<SelectState> {
       'https://api.covid19india.org/states_daily.json';
   static final districtUrl =
       'https://api.covid19india.org/districts_daily.json';
+  static final districtZoneUrl = 'https://api.covid19india.org/zones.json';
   //
 
   List<StatesInIndia> stateInfo;
   List<AffectedData> affectedData;
   List<StateNameOfDistricts> affectedDistricts;
+  List<DistrictZone> affectedDistrictZoneData;
   int affectedDataLength;
   List<String> dropDown = new List<String>();
   String selectedState;
+
+  //Parsing District zone
+
+  Future<List<DistrictZone>> getDistrictZone() async {
+    var response = await http.get(districtZoneUrl);
+    List<DistrictZone> zoneList = parseZone(response);
+    return zoneList;
+  }
+
+  static List<DistrictZone> parseZone(response) {
+    var list = json.decode(response.body);
+    List<DistrictZone> temp = [];
+    list['zones'].forEach((element) {
+      temp.add(DistrictZone.fromJson(element));
+    });
+    return temp;
+  }
+
+  //Parsing ends
 
 //Parsing State List
   Future<List<StatesInIndia>> getStates() async {
@@ -89,7 +111,6 @@ class _SelectStateState extends State<SelectState> {
   @override
   void initState() {
     super.initState();
-    getDistrictAffected();
     getStates().then((value) {
       stateInfo = value;
       getAffected().then((value) {
@@ -97,8 +118,11 @@ class _SelectStateState extends State<SelectState> {
         affectedDataLength = affectedData.length;
         getDistrictAffected().then((value) {
           affectedDistricts = value;
-          setState(() {
-            isLoading = false;
+          getDistrictZone().then((value) {
+            affectedDistrictZoneData = value;
+            setState(() {
+              isLoading = false;
+            });
           });
         });
       });
@@ -154,6 +178,7 @@ class _SelectStateState extends State<SelectState> {
                   affectedData: affectedData,
                   stateChosen: stateInfo[tempidx],
                   districtsAffected: affectedDistricts,
+                  districtZone: affectedDistrictZoneData,
                 ),
               ),
             );

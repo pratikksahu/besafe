@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import 'package:besafe/Json/districtzone.dart';
 
 import 'Json/affectedData.dart';
 import 'Json/districts.dart';
@@ -14,6 +15,7 @@ class CovidStatus extends StatefulWidget {
   final List<AffectedData> affectedData;
   final StatesInIndia stateChosen;
   final List<StateNameOfDistricts> districtsAffected;
+  final List<DistrictZone> districtZone;
 
   CovidStatus({
     Key key,
@@ -21,6 +23,7 @@ class CovidStatus extends StatefulWidget {
     this.affectedData,
     this.stateChosen,
     this.districtsAffected,
+    this.districtZone,
   }) : super(key: key) {
     print('CovidStatus Constructor $stateChosen');
   }
@@ -31,19 +34,27 @@ class CovidStatus extends StatefulWidget {
 
 class _CovidStatusState extends State<CovidStatus> {
   int index;
-  List<AffectedData> affectedData = [];
-  StatesInIndia stateChosen;
-  List<AffectedData> ofDateSelected = [];
+  List<AffectedData> affectedData = []; //
+  StatesInIndia
+      stateChosen; // It contains basic information about state , like capital and state code
+  List<AffectedData> ofDateSelected =
+      []; // To get The details inside Card , all cases till date
   List<StateNameOfDistricts> districtsAffected = [];
-  StateNameOfDistricts findDistrictRelatedState;
+  List<DistrictZone> districtZone =
+      []; // This stores green , red and orange zone data of each district
 
-  List<FlSpot> confirmedSpotxy = [];
-  List<FlSpot> recoveredSpotxy = [];
-  List<FlSpot> deceasedSpotxy = [];
+  StateNameOfDistricts
+      findDistrictRelatedState; // Finds the state which was received from selectState Page which was received as stateChosen Object
+
+  List<FlSpot> confirmedSpotxy = []; //X Y points for graph construction
+  List<FlSpot> recoveredSpotxy = []; //X Y points for graph construction
+  List<FlSpot> deceasedSpotxy = []; //X Y points for graph construction
 
   var date = DateTime.now();
-  String showingDateOnScreen;
-  String dateForDistrictData;
+  String
+      showingDateOnScreen; // This date is used to find data in card , this has to be of a day before because present data gets updated a day after
+  String
+      dateForDistrictData; // This date is used to get district level data , this data is updated on daily basis
   String latestStateDataDated; // Stores date of latest updated data
 
   List<Color> gradientColors = [
@@ -204,6 +215,7 @@ class _CovidStatusState extends State<CovidStatus> {
 
     index = widget.index;
     affectedData = widget.affectedData;
+    districtZone = widget.districtZone;
     stateChosen = widget
         .stateChosen; // containes code which is used to get data from affectedData obj
     print('State received in covid_status ${stateChosen.name}');
@@ -270,111 +282,228 @@ class _CovidStatusState extends State<CovidStatus> {
 
   districtListWidget() {
     List<Widget> list = [];
+    DistrictZone districtZoneColor;
+    var zoneColor = Colors.white;
+    Map<String, String> districtFix = {};
+    districtFix['Foreign Evacuees'] = 'Not Available';
+    districtFix['Unknown'] = 'Not Available';
+    //Fix for Andhra Pradesh
+    districtFix['Y.S.R.'] = 'Y.S.R. Kadapa';
+    districtFix['Y.S.R Kadapa'] = 'Y.S.R. Kadapa';
+    //Fix for Assam
+    districtFix['South Salmara Mancachar'] = 'South Salmara Mankachar';
+    //Fix for Bihar
+    districtFix['Kaimur Bhabua'] = 'Kaimur';
+    //Fix for Chhattisgarh
+    districtFix['Gaurela Pendra Marwahi'] = 'Not Available';
+    //fix for Gujarat
+    districtFix['Ahmadabad'] = 'Ahmedabad';
+    districtFix['Banas Kantha'] = 'Banaskantha';
+    districtFix['Chota Udaipur'] = 'Chhota Udaipur';
+    districtFix['Kachchh'] = 'Kutch';
+    districtFix['Mahesana'] = 'Mehsana';
+    districtFix['Panch Mahals'] = 'Panchmahal';
+    districtFix['Sabar Kantha'] = 'Sabarkantha';
+    //Fix for Haryana
+    districtFix['Charki Dadri'] = 'Charkhi Dadri';
+    districtFix['Italians*'] = 'Not Available';
+    districtFix['Italians'] = 'Not Available';
+    //Fix for J&K
+    districtFix['Badgam'] = 'Budgam';
+    districtFix['Bandipore'] = 'Bandipora';
+    districtFix['Baramula'] = 'Baramulla';
+    districtFix['Shupiyan'] = 'Shopiyan';
+    //Fix for Jharkand
+    districtFix['Kodarma'] = 'Koderma';
+    //Fix for Karnataka
+    districtFix['Bengaluru'] = 'Bengaluru Rural';
+    //Fix for Madhya Pradesh
+    districtFix['Other Region*'] = 'Not Available';
+    districtFix['Other Region'] = 'Not Available';
+    //Fis for Maharashtra
+    districtFix['Ahmadnagar'] = 'Ahmednagar';
+    districtFix['Bid'] = 'Beed';
+    districtFix['Buldana'] = 'Buldhana';
+    districtFix['Gondiya'] = 'Gondia';
+    districtFix['Other States*'] = 'Not Available';
+    districtFix['Other States'] = 'Not Available';
+    //Fix for Odisha
+    districtFix['Baleshwar'] = 'Not Available';
+    districtFix['Jajapur'] = 'Jajpur';
+    districtFix['Debagarh'] = 'Deogarh';
+    //Fix for Punjab
+    districtFix['Firozpur'] = 'Ferozepur';
+    //Fix for Rajasthan
+    districtFix['Dhaulpur'] = 'Dholpur';
+    districtFix['Evacuees*'] = 'Not Available';
+    districtFix['Evacuees'] = 'Not Available';
+    districtFix['Chittaurgarh'] = 'Chittorgarh';
+    districtFix['Others state'] = 'Not Available';
+    districtFix['BSF Camp'] = 'Not Available';
+    //Fix for sikkim
+    districtFix['East Sikkim'] = 'East District';
+    districtFix['North Sikkim'] = 'North District';
+    districtFix['South Sikkim'] = 'South District';
+    districtFix['West Sikkim'] = 'West District';
+    //Fix for Tamil Nadu
+    districtFix['Kanniyakumari'] = 'Kanyakumari';
+    districtFix['The Nilgiris'] = 'Nilgiris';
+    districtFix['Airport Quarantine'] = 'Not Available';
+    districtFix['Railway Quarantine'] = 'Not Available';
+    //Fix for Telangana
+    districtFix['Jagitial'] = 'Jagtial';
+    districtFix['Jangoan'] = 'Jangaon';
+    districtFix['Jayashankar'] = 'Jayashankar Bhupalapally';
+    districtFix['Kumuram Bheem Asifabad'] = 'Komaram Bheem';
+    //Fix for Uttar Pradesh
+    districtFix['Bara Banki'] = 'Barabanki';
+    districtFix['Kheri'] = 'Not Available';
+    districtFix['Mahrajganj'] = 'Maharajganj';
+    //Fix for West Bengal
+    districtFix['Medinipur East'] = 'Paschim Medinipur';
     for (var district in findDistrictRelatedState.districtList) {
+      var districtTofind = district.districtName;
+      if (districtFix.containsKey(district.districtName)) {
+        districtTofind = districtFix[district.districtName];
+      }
+      if (districtTofind != 'Not Available') {
+        for (var element in districtZone) {
+          if (element.district == districtTofind) {
+            districtZoneColor = element;
+            break;
+          }
+        }
+
+        if (districtZoneColor.zone == 'Green') {
+          zoneColor = Colors.green;
+        }
+        if (districtZoneColor.zone == 'Red') {
+          zoneColor = Colors.red;
+        }
+        if (districtZoneColor.zone == 'Orange') {
+          zoneColor = Colors.orange;
+        }
+      } else {
+        zoneColor = Colors.white;
+      }
+
       for (var caseList in district.caseType) {
         if (caseList.date == dateForDistrictData)
-          list.add(Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * .09,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Color.fromARGB(255, 255, 220, 120),
+          list.add(Column(
+            children: <Widget>[
+              Divider(
+                thickness: 2,
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      width: MediaQuery.of(context).size.width * .3,
-                      child: Text(
-                        district.districtName,
-                        style: TextStyle(fontSize: 20),
-                        textAlign: TextAlign.left,
-                        overflow: TextOverflow.fade,
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  // color: Color.fromARGB(255, 255, 220, 120),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Container(
+                        child: CircleAvatar(
+                          radius: 5,
+                          backgroundColor: zoneColor,
+                        ),
                       ),
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * .5,
-                      margin: EdgeInsets.only(right: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Column(
-                            children: <Widget>[
-                              Text(
-                                caseList.confirmed.toString(),
-                                style: TextStyle(fontSize: 17),
-                              ),
-                              Text(
-                                'C',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  color: Color(0xFFFF8748),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Text(
-                                caseList.active.toString(),
-                                style: TextStyle(fontSize: 17),
-                              ),
-                              Text(
-                                'A',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  color: Color(0xFFFF4848),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Text(
-                                caseList.recovered.toString(),
-                                style: TextStyle(fontSize: 17),
-                              ),
-                              Text(
-                                'R',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  color: Color(0xFF36C12C),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Text(
-                                caseList.deceased.toString(),
-                                style: TextStyle(
-                                  fontSize: 17,
-                                ),
-                              ),
-                              Text(
-                                'D',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  color: Color(0xFFFF0000),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                      Container(
+                        width: MediaQuery.of(context).size.width * .3,
+                        child: Text(
+                          district.districtName,
+                          style: TextStyle(fontSize: 10),
+                          overflow: TextOverflow.clip,
+                        ),
                       ),
-                    ),
-                  ],
+                      Container(
+                        width: MediaQuery.of(context).size.width * .5,
+                        margin: EdgeInsets.only(right: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Column(
+                              children: <Widget>[
+                                Text(
+                                  caseList.confirmed.toString(),
+                                  style: TextStyle(fontSize: 10),
+                                ),
+                                Text(
+                                  'C',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFFFF8748),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.fade,
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Text(
+                                  caseList.active.toString(),
+                                  style: TextStyle(fontSize: 10),
+                                ),
+                                Text(
+                                  'A',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFFFF4848),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.fade,
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Text(
+                                  caseList.recovered.toString(),
+                                  style: TextStyle(fontSize: 10),
+                                ),
+                                Text(
+                                  'R',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFF36C12C),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.fade,
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Text(
+                                  caseList.deceased.toString(),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                Text(
+                                  'D',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFFFF0000),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.fade,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ));
       }
     }

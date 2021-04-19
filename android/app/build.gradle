@@ -54,11 +54,7 @@ android {
             signingConfig signingConfigs.debug
         }
     }
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xlint:deprecation"
-        }
-    }
+
 }
 
 flutter {
